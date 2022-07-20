@@ -1,0 +1,49 @@
+.how-it-works-wrapper {
+    width: 100%;
+    padding: 70px;
+}
+
+.how-it-works-wrapper .HEADER {
+    font-weight: 900;
+    font-size: 64px;
+    line-height: 131.5%;
+    text-align: center;
+}
+
+.how-it-works-wrapper .SUB_HEADER {
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 131.5%;
+    text-align: center;
+}
+
+.how-triple-flex {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+.how-triple-flex .how-triple-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 18%;
+    margin: 0 50px;
+}
+
+.how-triple-container .STEPS_HEADER {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 131.5%;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.how-triple-container .STEPS_DESCRIPTION {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 131.5%;
+    text-align: center;
+}

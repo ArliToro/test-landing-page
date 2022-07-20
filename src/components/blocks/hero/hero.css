@@ -1,0 +1,114 @@
+.HERO_01_LEFTTEXT,
+.HERO_02_RIGHTTEXT {
+    width: 100%;
+    padding: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.HERO_02_RIGHTTEXT {
+    flex-direction: row-reverse;
+}
+
+.HERO_03_IMGBKGD, .HERO_04_CENTERTEXT {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 10%;
+}
+
+.HERO_04_CENTERTEXT {
+    justify-content: center;
+    padding-left: 0;
+}
+
+.HERO_03_IMGBKGD .text-containers {
+    background-color: white;
+    position: relative;
+    max-width: 600px;
+    padding: 30px;
+    z-index: 2;
+}
+
+.HERO_04_CENTERTEXT .text-containers {
+    position: relative;
+    z-index: 3;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.HERO_04_CENTERTEXT:after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: rgba(0,0,0,.65);
+}
+
+.HERO_01_LEFTTEXT .text-containers,
+.HERO_02_RIGHTTEXT .text-containers{
+    max-width: 520px;
+}
+
+.HERO_01_LEFTTEXT .HEADER,
+.HERO_02_RIGHTTEXT .HEADER,
+.HERO_03_IMGBKGD .HEADER,
+.HERO_04_CENTERTEXT .HEADER{
+    font-weight: 900;
+    font-size: 64px;
+    line-height: 131.5%;
+    padding: 10px 60px;
+}
+
+.HERO_01_LEFTTEXT .SUB_HEADER,
+.HERO_02_RIGHTTEXT .SUB_HEADER,
+.HERO_03_IMGBKGD .SUB_HEADER,
+.HERO_04_CENTERTEXT .SUB_HEADER{
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 131.5%;
+    padding: 10px 60px;
+}
+
+.HERO_01_LEFTTEXT img,
+.HERO_02_RIGHTTEXT img {
+    max-width: 600px;
+    width: 30vw;
+    height: 30vw;
+    object-fit: cover;
+}
+
+.HERO_03_IMGBKGD img,.HERO_04_CENTERTEXT img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.HERO_01_LEFTTEXT button,
+.HERO_02_RIGHTTEXT button,
+.HERO_03_IMGBKGD button,
+.HERO_04_CENTERTEXT button{
+    font-size: 16px;
+    padding: 20px;
+    width: 167px;
+    height: 61px;
+    background: #FFFFFF;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    text-align: center;
+    margin: 10px 60px;
+    cursor: pointer;
+}

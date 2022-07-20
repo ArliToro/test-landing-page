@@ -1,0 +1,111 @@
+name: v1.0.$(date:yy).$(date:MM).$(date:dd)$(rev:r)
+variables:
+    image: landing-page.dev
+trigger:
+    branches:
+        include:
+            #- master
+            - dev
+    paths:
+        include:
+        - src/*
+        - public/*
+        - package*.json
+
+jobs:
+    - job: BuildImageForPR
+      displayName: Build Image For PR
+      condition: eq('${{ variables['Build.Reason'] }}', 'PullRequest')
+      pool:
+          vmImage: 'ubuntu-20.04'
+      steps:
+          - bash: |
+                docker build -t $(image) -f $(Build.SourcesDirectory)/Dockerfile .
+            displayName: Build Docker Image '$(image)'
+
+    - job: BuildImage
+      displayName: Build Image
+      condition: ne('${{ variables['Build.Reason'] }}', 'PullRequest')
+      pool:
+          vmImage: 'ubuntu-20.04'
+      steps:
+          - bash: |
+                docker build -t $(image):latest -f $(Build.SourcesDirectory)/Dockerfile .
+                echo "Adding image tag: '$(Build.BuildNumber)' ..."
+                docker tag $(image):latest $(image):$(Build.BuildNumber)
+                echo "Adding image tag: '$(Build.SourceBranchName)' ..."
+                docker tag $(image):latest $(image):$(Build.SourceBranchName)
+            displayName: Build Docker Image '$(image)'
+
+
+          # - task: Npm@1
+          #   inputs:
+          #     command: 'install'
+          #     workingDir: '$(Build.SourcesDirectory)'
+          
+          # - task: Npm@1
+          #   displayName: npm run test
+          #   inputs:
+          #     command: 'custom'
+          #     workingDir: 'src'
+          #     customCommand: 'run test react-scripts'
+
+
+          # - task: PublishTestResults@2
+          #   # displayName: 'supply npm test results to pipelines'
+          #   condition: succeededOrFailed() # because otherwise we won't know what tests failed
+          #   inputs:
+          #     testResultsFiles: 'src/App.test.js'
+
+          - task: ECRPushImage@1
+            displayName: Push Docker Image '$(image):latest'
+            inputs:
+              awsCredentials: AWS_ECR
+              regionName: us-east-1
+              imageSource: imagename
+              sourceImageName: $(image)
+              repositoryName: $(image)
+          - task: ECRPushImage@1
+            displayName: Push Docker Image '$(image):$(Build.BuildNumber)'
+            inputs:
+              awsCredentials: AWS_ECR
+              regionName: us-east-1
+              imageSource: imagename
+              sourceImageName: $(image)
+              sourceImageTag: $(Build.BuildNumber)
+              repositoryName: $(image)
+              pushTag: $(Build.BuildNumber)
+          - task: ECRPushImage@1
+            displayName: Push Docker Image '$(image):$(Build.SourceBranchName)'
+            inputs:
+              awsCredentials: AWS_ECR
+              regionName: us-east-1
+              imageSource: imagename
+              sourceImageName: $(image)
+              sourceImageTag: $(Build.SourceBranchName)
+              repositoryName: $(image)
+              pushTag: $(Build.SourceBranchName)
+          - bash: |
+                function tagSource() {
+                  URI="$ORGANIZATION$PROJECT/_apis/git/repositories/$REPO/annotatedtags?api-version=5.0-preview.1"
+                  URI=$(echo $URI | sed 's/ /%20/g')
+                  BODY='{"name":"'$1'","taggedObject":{"objectId":"'$COMMITSHA'"},"message":"'$BUILD_SOURCEBRANCH' ('$COMMITSHA')"}'
+                  curl -X POST -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" -H "Content-Type: application/json" -d "$BODY" "$URI"
+                }
+                isDefault() { [[ $BUILD_SOURCEBRANCH == refs/heads/master ]] || [[ $BUILD_SOURCEBRANCH == refs/heads/main ]]; }
+                isDev() { [[ $BUILD_SOURCEBRANCH == refs/heads/dev ]]; }
+                canAddTags() { isDefault || isDev ; }
+                if  canAddTags ; then
+                    tagSource "deployable-$VERSION"
+                    if isDefault ; then tagSource "default-$VERSION"; fi
+                    if isDev ; then tagSource "feature-$VERSION"; fi
+                fi
+            displayName: Tag Souce According to Release Strategy
+            env:
+                SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+                BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+                ORGANIZATION: $(System.CollectionUri)
+                PROJECT: $(System.TeamProject)
+                REPO: $(Build.Repository.ID)
+                COMMITSHA: $(Build.SourceVersion)
+                VERSION: $(Build.BuildNumber)
